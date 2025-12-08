@@ -1,0 +1,53 @@
+{
+  "name": "Abuse Elevation Control Mechanism",
+  "id": "T1548",
+  "description": "Атакующие могут обходить механизмы контроля повышения привилегий, чтобы работать с повышенными правами и обходить политику доступа. Такие механизмы предназначены для управления тем, как процессы получают повышенные права (администратор, SYSTEM, root и т.д.). Обход этих механизмов часто позволяет злоумышленнику получить повышенные привилегии без явного запроса у пользователя и без оставления явных следов в журналах.",
+  "sub_techniques": [
+    {
+      "id": "T1548.001",
+      "name": "Setuid and Setgid",
+      "description": "Атакующий может злоупотреблять setuid/setgid-битами на бинарных файлах, чтобы выполнить программу с повышенными привилегиями (часто root). Пример: эксплуатация уязвимых setuid-программ (sudo, pkexec, passwd и т.д.)."
+    },
+    {
+      "id": "T1548.002",
+      "name": "Bypass User Account Control",
+      "description": "Атакующие могут обходить UAC (Windows) с помощью техник типа eventvwr.exe, fodhelper.exe, sdclt.exe, cmstp.exe, silentcleanup и других «living-off-the-land»-утилит."
+    },
+    {
+      "id": "T1548.003",
+      "name": "Sudo and Sudo Caching",
+      "description": "Злоупотребление кэшированием пароля sudo или настройками в /etc/sudoers (например, NOPASSWD, !authenticate). Также известные CVE: Baron Samedit (CVE-2021-3156)."
+    },
+    {
+      "id": "T1548.004",
+      "name": "Elevated Permissions via Accessibility Features",
+      "description": "Замена системных утилит доступности (sethc.exe, utilman.exe, osk.exe и др.) на cmd.exe или обратную оболочку для получения SYSTEM при экране блокировки."
+    },
+    {
+      "id": "T1548.005",
+      "name": "Temporary Elevated Groups",
+      "description": "Добавление пользователя в привилегированную группу (например, через net localgroup) с последующим выходом — членство сохраняется до перезагрузки."
+    },
+    {
+      "id": "T1548.006",
+      "name": "Kernel Extensions / macOS Entitlements",
+      "description": "Злоупотребление расширениями ядра (kext) или entitlements в macOS для обхода SIP и получения root-прав."
+    }
+  ],
+  "platforms": ["Linux", "macOS", "Windows"],
+  "permissions_required": ["User", "Administrator"],
+  "mitigations": [
+    "Отключение ненужных автоэлеватных бинарников (eventvwr, fodhelper и т.д.)",
+    "Включение строгой политики UAC (Always Notify)",
+    "Использование AppLocker/Software Restriction Policies",
+    "Отключение legacy accessibility features",
+    "Ограничение NOPASSWD в sudoers",
+    "Обновление ПО (особенно sudo, pkexec)"
+  ],
+  "detection_hints": [
+    "Запуск cmd/powershell из utilman.exe, sethc.exe, osk.exe",
+    "Необычные дочерние процессы от auto-elevated бинарников",
+    "Изменение реестра в HKCU\\Software\\Classes\\mscfile\\shell\\open\\command",
+    "Команды sudo без ввода пароля у обычных пользователей"
+  ]
+}
